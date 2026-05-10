@@ -61,5 +61,5 @@ Microsoft SQL Server<br>
 Database Setup<br>
 Open SQL Server Management Studio (SSMS)<br>
 
-Run the provided .sql script to generate the DVLD database and its relational schema.
+restore the DVLD database that will find in the database folder.
 Update the connection string in DataLayer/clsDataAccessSettings.cs.
