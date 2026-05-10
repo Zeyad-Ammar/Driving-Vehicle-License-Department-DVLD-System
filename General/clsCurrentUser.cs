@@ -70,7 +70,7 @@ namespace DVLD_Project.General
 
                 if (StoredCredentials != null)
                 {
-                    string[] LoginCredintals = StoredCredentials.ToString().Split(Convert.ToChar("#//#"));
+                    string[] LoginCredintals = StoredCredentials.Split(new string[] { "#//#" }, StringSplitOptions.None);
 
 
                     UserName = LoginCredintals[0];
