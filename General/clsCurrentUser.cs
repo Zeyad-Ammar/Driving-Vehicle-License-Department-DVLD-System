@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
-
+using Microsoft.Win32;
 
 namespace DVLD_Project.General
 {
@@ -17,8 +17,11 @@ namespace DVLD_Project.General
 
         
 
-        private static string _path = @"C:\RememberUser\User.txt";
+        private static string _path = @"HKEY_CURRENT_USER\SOFTWARE\DVLD";
 
+        private static string _DataName = @"SAVEDUSERNAME";
+
+       
         public static bool checkAuthentication(string UserName,string Password)
         {
          
@@ -35,31 +38,15 @@ namespace DVLD_Project.General
             try
             {
                 
-                string currentDirectory = System.IO.Directory.GetCurrentDirectory();
-
-
-               
-                string filePath = currentDirectory + "\\LoginData.txt";
-
+              
                 
-                if (User.UserName == "" && File.Exists(filePath))
-                {
-                    File.Delete(filePath);
-                    return true;
-
-                }
-
                
                 string dataToSave = User.UserName + "#//#" + User.Password;
 
-                
-                using (StreamWriter writer = new StreamWriter(filePath))
-                {
-                    
-                    writer.WriteLine(dataToSave);
+                Registry.SetValue(_path,_DataName, dataToSave,RegistryValueKind.String);
 
-                    return true;
-                }
+                return true;
+               
             }
             catch (Exception ex)
             {
@@ -79,41 +66,29 @@ namespace DVLD_Project.General
             try
             {
                
-                string currentDirectory = System.IO.Directory.GetCurrentDirectory();
+                var StoredCredentials = Registry.GetValue(_path,_DataName, null) as string;
+
+                if (StoredCredentials != null)
+                {
+                    string[] LoginCredintals = StoredCredentials.ToString().Split(Convert.ToChar("#//#"));
 
 
-                string filePath = currentDirectory + "\\LoginData.txt";
+                    UserName = LoginCredintals[0];
+                    Password = LoginCredintals[1];
+                    return true;
+                }
+                
 
                
-                if (File.Exists(filePath))
-                {
-                   
-                    using (StreamReader reader = new StreamReader(filePath))
-                    {
-                       
-                        string line;
-                        while ((line = reader.ReadLine()) != null)
-                        {
-                            Console.WriteLine(line); 
-                            string[] result = line.Split(new string[] { "#//#" }, StringSplitOptions.None);
-
-                            UserName = result[0];
-                            Password = result[1];
-                        }
-                        return true;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
+           
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"An error occurred: {ex.Message}");
-                return false;
+                
             }
 
+            return false;
 
         }
 

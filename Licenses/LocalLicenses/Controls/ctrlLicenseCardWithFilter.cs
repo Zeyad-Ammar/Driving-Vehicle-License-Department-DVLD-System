@@ -86,7 +86,7 @@ namespace DVLD_Project.Licenses.Controls
                 //trigger the event to notify the parent form that a license has been selected
                 if (onLicenseSelected != null)
                 {
-                    onLicenseSelected(LicenseID);
+                    LicenseSelected(LicenseID);
                 }
             }
             else

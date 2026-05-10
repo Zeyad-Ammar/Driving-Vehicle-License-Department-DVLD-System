@@ -8,6 +8,6 @@ namespace DataLayer
 {
     public class clsDataAccessSettings
     {
-        public static string connectionString= "Server=.;Database=DVLD;User Id=sa;Password=123456";
+        public static string connectionString= "Server=ASCII;Database=DVLD;User Id=sa;Password=123456";
     }
 }
