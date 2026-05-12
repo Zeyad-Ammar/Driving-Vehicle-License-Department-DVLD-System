@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace DVLD_Project
 {
     public class clsUtil
     {
+        private static string SourceName = "DVLD_Project";
         public static string GenerateGUID()
         {
 
@@ -80,6 +82,18 @@ namespace DVLD_Project
 
             sourceFile = destinationFile;
             return true;
+        }
+
+
+        public static void LogInformation(string message)
+        {
+            if (!EventLog.SourceExists(SourceName))
+            {
+                EventLog.CreateEventSource(SourceName, "Application");
+            }
+
+            EventLog.WriteEntry(SourceName, $"Info: {message}", EventLogEntryType.Information);
+
         }
     }
 }

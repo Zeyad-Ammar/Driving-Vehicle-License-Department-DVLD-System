@@ -37,6 +37,8 @@ namespace DataLayer
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying To Get Test Types");
             }
             finally { 
@@ -80,6 +82,7 @@ Where TestTypeID=@TestTypeID";
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
                 MessageBox.Show("Error When Trying To Get The Test Type");
             }
             finally
@@ -124,6 +127,7 @@ Where TestTypeID=@TestTypeID";
 
             }
             catch (Exception ex) {
+                clsUtilityDataLayer.LogError(ex);
                 MessageBox.Show("Error When Trying To UpdateApplicationStatus The Test Type Data");
             }
             finally

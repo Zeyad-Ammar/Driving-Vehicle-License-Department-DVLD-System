@@ -31,7 +31,9 @@ namespace DataLayer
                     Countries.Load(reader);
                 }
             }
-            catch (Exception ex) { 
+            catch (Exception ex) {
+                clsUtilityDataLayer.LogError(ex);
+
                 Countries.Rows.Add(ex.Message);
             }
             finally {
@@ -62,7 +64,10 @@ namespace DataLayer
                 }
             }
             catch (Exception ex) {
-                
+
+
+                clsUtilityDataLayer.LogError(ex);
+
             }
             finally { 
 
@@ -98,6 +103,7 @@ namespace DataLayer
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
             }
             finally
@@ -137,7 +143,9 @@ where CountryID=@CountryID";
                 }
                 reader.Close();
             }
-            catch (Exception ex) { 
+            catch (Exception ex) {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show(ex.Message);
             }
             finally

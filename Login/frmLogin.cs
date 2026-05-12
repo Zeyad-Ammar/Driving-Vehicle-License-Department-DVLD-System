@@ -37,6 +37,8 @@ namespace DVLD_Project
                 clsCurrentUser.StoreCurrentUserCredentials();
             }
            
+
+            clsUtil.LogInformation($"User {clsCurrentUser.User.UserName} logged in. at {DateTime.Now}");
             MainForm mainForm = new MainForm(this);
             this.Hide();
             mainForm.ShowDialog();

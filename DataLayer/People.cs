@@ -50,6 +50,7 @@ namespace DataLayer
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
             }
             finally
@@ -89,6 +90,7 @@ namespace DataLayer
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
             }
             finally
@@ -128,6 +130,7 @@ namespace DataLayer
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
             }
             finally
@@ -218,6 +221,8 @@ namespace DataLayer
                 }
             }
             catch (Exception ex) {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("The Program Has Error While Adding New Person.");
             }
             finally
@@ -278,6 +283,7 @@ namespace DataLayer
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
             }
             finally
@@ -346,6 +352,7 @@ namespace DataLayer
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
             }
             finally
@@ -413,6 +420,7 @@ namespace DataLayer
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
             }
             finally
@@ -465,7 +473,8 @@ namespace DataLayer
                 }
             }
             catch (Exception ex) { 
-            
+                clsUtilityDataLayer.LogError(ex);
+
             }
             finally {
                 connection.Close(); 
@@ -496,6 +505,8 @@ namespace DataLayer
                 }
             }
             catch (Exception ex) {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show(ex.Message);
             }
             finally {

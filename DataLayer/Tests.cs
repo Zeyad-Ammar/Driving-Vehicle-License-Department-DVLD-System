@@ -51,6 +51,7 @@ Select Scope_Identity()";
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
                 MessageBox.Show("Error When Trying to Add Test"); ;
             }
             finally
@@ -92,6 +93,8 @@ SELECT top(1) found=1
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying to check Passed The Test"); 
             }
             finally
@@ -140,6 +143,8 @@ SELECT [TestID]
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying to Get Test");
             }
             finally

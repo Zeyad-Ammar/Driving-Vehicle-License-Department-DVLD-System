@@ -39,6 +39,8 @@ namespace DataLayer
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying To Get License Classes Data");
             }
             finally
@@ -84,7 +86,11 @@ namespace DataLayer
                 }
                 Reader.Close();
 
-            } catch (Exception ex) {
+            } 
+            catch (Exception ex) 
+            {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying To Get License Class Data");
             }
             finally

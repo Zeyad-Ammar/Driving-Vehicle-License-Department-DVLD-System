@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
-
 namespace DataLayer
 {
     public class Users
@@ -43,6 +42,8 @@ namespace DataLayer
                 reader.Close();
             }
             catch (Exception ex) {
+                
+                clsUtilityDataLayer.LogError(ex);
                 MessageBox.Show("Error While Try Get Users Data");
             }
             finally
@@ -88,6 +89,7 @@ Select Scope_Identity()
 
             }
             catch (Exception ex) {
+                clsUtilityDataLayer.LogError(ex);
                 MessageBox.Show("Error When Try Add New User");
             }
             finally { 
@@ -132,6 +134,8 @@ Select Scope_Identity()
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Try Add New User");
             }
             finally
@@ -165,7 +169,10 @@ Select Scope_Identity()
                 }
             }catch(Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error While Tring Delete User");
+               
             }
             finally
             {
@@ -212,6 +219,7 @@ Where UserID=@UserID";
 
             }
             catch (Exception ex) {
+                clsUtilityDataLayer.LogError(ex);
                 MessageBox.Show("Error While Tring Get User");
             }finally {
                 connection.Close();
@@ -258,6 +266,7 @@ Where UserName=@UserName and Password=@Password";
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
                 MessageBox.Show("Error While Tring Get User");
             }
             finally
@@ -299,6 +308,7 @@ Where [UserName]=@UserName and [Password]=@Password and [IsActive]=1";
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
                 MessageBox.Show("Error While Tring Check Account Existing");
             }
             finally
@@ -337,6 +347,7 @@ Where PersonID=@PersonID";
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
                 MessageBox.Show("Error While Tring Get User");
             }
             finally

@@ -46,6 +46,7 @@ order by IsActive desc , ExpirationDate
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
                 MessageBox.Show($"Error When Trying to Get All international License of Driver with ID: {DriverID}");
 
@@ -97,6 +98,7 @@ order by IsActive desc , ExpirationDate
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
                 MessageBox.Show($"Error When Trying to Get All international License");
 
@@ -167,6 +169,8 @@ Select SCOPE_IDENTITY();
             }
             catch(Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show($"Error When Trying to Add International License for Driver with ID: {DriverID}");
             }
             finally
@@ -215,6 +219,8 @@ Select SCOPE_IDENTITY();
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show($"Error When Trying to Get International License with ID: {InternationalLicenseID}");
             }
             finally
@@ -249,6 +255,8 @@ Select SCOPE_IDENTITY();
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show($"Error When Trying to Get Last International License ID of Driver with ID: {DriverID}");
             }
             finally

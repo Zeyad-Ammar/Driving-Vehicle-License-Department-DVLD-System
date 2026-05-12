@@ -35,6 +35,8 @@ Order by ApplicationDate;
 
             }
             catch(Exception ex) {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying To get Local License Applications");
             }
             finally {
@@ -75,6 +77,8 @@ Where Applications.ApplicantPersonID=@PersonID and LicenseClassID=@LicenseClassI
 
             }
             catch (Exception ex) {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show($"Error when try to check if the LDLApp for The Person W/ ID {PersonID} w/ Class {LicenseClassID} is Exist");
             }
             finally
@@ -119,6 +123,8 @@ Where Applications.ApplicantPersonID=@PersonID and LicenseClassID=@LicenseClassI
 
 
             } catch (Exception ex) {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying to add new Local Driving Licence App");
             }
             finally
@@ -221,6 +227,8 @@ Where Applications.ApplicantPersonID=@PersonID and LicenseClassID=@LicenseClassI
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show($"Error when trying to Get Local App Data");
             }
             finally
@@ -264,6 +272,8 @@ Where Applications.ApplicantPersonID=@PersonID and LicenseClassID=@LicenseClassI
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show($"Error when trying to Delete Local App Data");
             }
             finally

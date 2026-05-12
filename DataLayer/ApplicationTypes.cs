@@ -38,6 +38,8 @@ namespace DataLayer
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error While Try Back Application Types");
             }
             finally
@@ -73,6 +75,8 @@ namespace DataLayer
                 }
             }
             catch (Exception ex) {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error While Trying UpdateApplicationStatus The Price");
             }
             finally { 
@@ -114,7 +118,10 @@ Where ApplicationTypeID=@ApplicationTypeID";
                 }
 
             }
-            catch (Exception ex) { }
+            catch (Exception ex) { 
+                clsUtilityDataLayer.LogError(ex);
+
+            }
             finally
             {
                 connection.Close(); 

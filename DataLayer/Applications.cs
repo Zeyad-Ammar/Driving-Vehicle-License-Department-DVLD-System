@@ -59,6 +59,7 @@ Select SCOPE_IDENTITY();";
 
             }
             catch (Exception ex) {
+                clsUtilityDataLayer.LogError(ex);
 
                 MessageBox.Show("Error When Trying to Add New Application");
             
@@ -105,6 +106,7 @@ Select SCOPE_IDENTITY();";
 
             }
             catch (Exception ex) {
+                clsUtilityDataLayer.LogError(ex);
                 MessageBox.Show("Error When Trying to update The Application");
             }
             finally
@@ -154,6 +156,8 @@ Select SCOPE_IDENTITY();";
                 Reader.Close();
             }
             catch (Exception ex) {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying to Get The Application");
             }
             finally
@@ -196,6 +200,8 @@ Select SCOPE_IDENTITY();";
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show($"Error when trying to Delete App Data");
             }
             finally

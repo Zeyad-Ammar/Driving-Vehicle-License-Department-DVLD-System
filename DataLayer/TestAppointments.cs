@@ -39,7 +39,9 @@ Where LocalDrivingLicenseApplicationID=@LocalDrivingLicenseApplicationID and Tes
                 }
                 Reader.Close();
             }
-            catch (Exception ex) { 
+            catch (Exception ex) {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying to get All Test Appointments for local App"); ;
             }
             finally
@@ -77,6 +79,8 @@ Where LocalDrivingLicenseApplicationID=@LocalDrivingLicenseApplicationID and Tes
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying to get number of Test Appointments for local App"); ;
             }
             finally
@@ -136,6 +140,8 @@ Select Scope_Identity()";
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying to Add New Test Appointments for local App"); ;
             }
             finally
@@ -181,23 +187,24 @@ Select Scope_Identity()";
             }
 
             try
+            {
+                connection.Open();
+                var AffectedRows = command.ExecuteNonQuery();
+                if (AffectedRows > 0)
                 {
-                    connection.Open();
-                    var AffectedRows = command.ExecuteNonQuery();
-                    if (AffectedRows>0)
-                    {
-                        isDone = true;
-                    }
+                    isDone = true;
+                }
 
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error When Trying to Add New Test Appointments for local App"); ;
-                }
-                finally
-                {
-                    connection.Close();
-                }
+            }
+            catch (Exception ex)
+            {
+                clsUtilityDataLayer.LogError(ex);
+                MessageBox.Show("Error When Trying to Add New Test Appointments for local App"); ;
+            }
+            finally
+            {
+                connection.Close();
+            }
 
             return isDone;
         }
@@ -228,6 +235,7 @@ where LocalDrivingLicenseApplicationID=@LocalDrivingLicenseApplicationID and Tes
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
                 MessageBox.Show("Error When Trying to check Existing of open Test Appointments for local App"); ;
             }
             finally
@@ -278,6 +286,7 @@ where LocalDrivingLicenseApplicationID=@LocalDrivingLicenseApplicationID and Tes
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
                 MessageBox.Show("Error When Trying to get  Test Appointment for local App"); ;
             }
             finally

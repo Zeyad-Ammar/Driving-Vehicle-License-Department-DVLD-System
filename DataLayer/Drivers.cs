@@ -40,7 +40,9 @@ namespace DataLayer
 
                 Reader.Close();
             }
-            catch (Exception ex) { 
+            catch (Exception ex) {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying To Get The Drivers Data");
             }
             finally
@@ -77,6 +79,8 @@ namespace DataLayer
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying To Check Person exist in Drivers Data");
             }
             finally
@@ -122,6 +126,7 @@ Select SCOPE_IDENTITY();";
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
                 MessageBox.Show("Error When Trying to Add New Driver");
 
@@ -169,6 +174,8 @@ Select SCOPE_IDENTITY();";
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying To Get Driver Data");
             }
             finally
@@ -212,6 +219,8 @@ Select SCOPE_IDENTITY();";
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying To Get Driver Data");
             }
             finally

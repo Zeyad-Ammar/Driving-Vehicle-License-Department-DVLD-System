@@ -25,27 +25,6 @@ namespace DVLD_Project.General
             return User != null;
         }
 
-
-        public static void SetTheLastRememberedLogin()
-        {
-
-            
-           
-           
-
-
-
-
-        }
-
-        public static void LoadTheLastRememberMeLogin()
-        {
-           
-
-            
-           
-        }
-
          
 
     }

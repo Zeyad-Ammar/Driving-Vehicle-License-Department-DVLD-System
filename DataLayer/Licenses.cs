@@ -50,6 +50,7 @@ namespace DataLayer
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
                 MessageBox.Show($"Error When Trying to Get All License of Driver with ID: {DriverID}");
 
@@ -128,6 +129,7 @@ Select SCOPE_IDENTITY();";
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
                 MessageBox.Show("Error When Trying to Add New License");
 
@@ -205,6 +207,7 @@ Select SCOPE_IDENTITY();";
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
                 MessageBox.Show("Error When Trying to Add New License");
 
@@ -251,6 +254,7 @@ Select SCOPE_IDENTITY();";
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
                 MessageBox.Show($"Error When Trying to Deactivate License with ID: {LicenseID}");
 
@@ -316,6 +320,7 @@ Where LicenseID=@LicenseID
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
                 MessageBox.Show("Error When Trying to Get License");
 
@@ -388,6 +393,7 @@ Where ApplicationID=@ApplicationID
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
                 MessageBox.Show("Error When Trying to Get License");
 
@@ -442,6 +448,7 @@ Where [DriverID]=@DriverID and [LicenseClass]=@LicenseClassID and IsActive=1
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
 
                 MessageBox.Show("Error When Trying to Check is there an active License of this class for this driver");
 

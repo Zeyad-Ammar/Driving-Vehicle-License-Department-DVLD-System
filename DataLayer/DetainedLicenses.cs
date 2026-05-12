@@ -41,6 +41,8 @@ namespace DataLayer
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying To check License is Detained?");
             }
             finally
@@ -74,6 +76,8 @@ namespace DataLayer
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying To Get The Detained Licenses Data");
             }
             finally
@@ -139,6 +143,8 @@ namespace DataLayer
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying To Detain License");
             }
             finally
@@ -201,6 +207,8 @@ Where LicenseID=@LicenseID and IsReleased=0";
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying To Get The Detained License Data");
             }
             finally
@@ -262,6 +270,8 @@ Where DetainID=@DetainID";
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying To Get The Detained License Data");
             }
             finally
@@ -312,6 +322,8 @@ Where DetainID=@DetainID";
             }
             catch (Exception ex)
             {
+                clsUtilityDataLayer.LogError(ex);
+
                 MessageBox.Show("Error When Trying To Release Detained License");
             }
             finally
