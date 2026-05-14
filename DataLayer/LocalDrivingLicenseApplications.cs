@@ -14,34 +14,43 @@ namespace DataLayer
 
         public static DataTable GetAllLocalDrivingLicenseApplications()
         {
-            SqlConnection connection =new SqlConnection(clsDataAccessSettings.connectionString);
+            DataTable dt = new DataTable();
 
-            string Query = @"  
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
+
+                string Query = @"  
 select * from [LDLicenseApplicationView]
 Order by ApplicationDate;
 ";
 
-            SqlCommand command = new SqlCommand(Query, connection);
+                using (SqlCommand command = new SqlCommand(Query, connection))
+                {
 
-            DataTable dt=new DataTable();
-            try {
+                    
+                    try
+                    {
 
-                connection.Open();
-                var Reader=command.ExecuteReader();
-                if (Reader.HasRows) { 
-                    dt.Load(Reader);
+                        connection.Open();
+                        using (var Reader = command.ExecuteReader())
+                        {
+                            if (Reader.HasRows)
+                            {
+                                dt.Load(Reader);
+                            }
+                        }
+                        
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error When Trying To get Local License Applications");
+                    }
+                    
+
                 }
-                Reader.Close();
-
-            }
-            catch(Exception ex) {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error When Trying To get Local License Applications");
-            }
-            finally {
-
-                connection.Close();
 
             }
 
@@ -53,37 +62,41 @@ Order by ApplicationDate;
         {
             bool isExist=false;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"SELECT Found=1
+                string Query = @"SELECT Found=1
   FROM [DVLD].[dbo].[LocalDrivingLicenseApplications]
   inner join Applications
   on Applications.ApplicationID=LocalDrivingLicenseApplications.ApplicationID
 Where Applications.ApplicantPersonID=@PersonID and LicenseClassID=@LicenseClassID and Applications.ApplicationStatus  <> 2;";
 
-            SqlCommand command =new SqlCommand(Query, connection);
+                using (SqlCommand command = new SqlCommand(Query, connection))
+                {
 
-            command.Parameters.AddWithValue("PersonID", PersonID);
-            command.Parameters.AddWithValue("LicenseClassID", LicenseClassID);
+                    command.Parameters.AddWithValue("PersonID", PersonID);
+                    command.Parameters.AddWithValue("LicenseClassID", LicenseClassID);
 
-            try
-            {
-                connection.Open();
-                var found=command.ExecuteScalar();
-                if (found != null) { 
-                    isExist = true;
+                    try
+                    {
+                        connection.Open();
+                        var found = command.ExecuteScalar();
+                        if (found != null)
+                        {
+                            isExist = true;
+                        }
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show($"Error when try to check if the LDLApp for The Person W/ ID {PersonID} w/ Class {LicenseClassID} is Exist");
+                    }
+                    
+
                 }
-
-
-            }
-            catch (Exception ex) {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show($"Error when try to check if the LDLApp for The Person W/ ID {PersonID} w/ Class {LicenseClassID} is Exist");
-            }
-            finally
-            {
-                connection.Close();
             }
 
 
@@ -95,9 +108,11 @@ Where Applications.ApplicantPersonID=@PersonID and LicenseClassID=@LicenseClassI
 
         public static int AddLocalApplication(int ApplicationID,int LicenseClassID)
         {
-           SqlConnection connection=new SqlConnection(clsDataAccessSettings.connectionString);
+            int ID = -1;
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"INSERT INTO [dbo].[LocalDrivingLicenseApplications]
+                string Query = @"INSERT INTO [dbo].[LocalDrivingLicenseApplications]
            ([ApplicationID]
            ,[LicenseClassID])
      VALUES
@@ -106,30 +121,32 @@ Where Applications.ApplicantPersonID=@PersonID and LicenseClassID=@LicenseClassI
             Select Scope_Identity()";
 
 
-            SqlCommand command=new SqlCommand(Query, connection);
-
-            command.Parameters.AddWithValue("ApplicationID",ApplicationID);
-            command.Parameters.AddWithValue("LicenseClassID",LicenseClassID);
-
-            int ID = -1;
-            try
-            {
-                connection.Open();
-                var newID=command.ExecuteScalar();
-                if (newID != null)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    ID=Convert.ToInt32(newID);
+
+                    command.Parameters.AddWithValue("ApplicationID", ApplicationID);
+                    command.Parameters.AddWithValue("LicenseClassID", LicenseClassID);
+
+                   
+                    try
+                    {
+                        connection.Open();
+                        var newID = command.ExecuteScalar();
+                        if (newID != null)
+                        {
+                            ID = Convert.ToInt32(newID);
+                        }
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error When Trying to add new Local Driving Licence App");
+                    }
+                    
                 }
-
-
-            } catch (Exception ex) {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error When Trying to add new Local Driving Licence App");
-            }
-            finally
-            {
-                connection.Close();
             }
 
             return ID;
@@ -177,9 +194,10 @@ Where Applications.ApplicantPersonID=@PersonID and LicenseClassID=@LicenseClassI
         {
             bool isExist = false;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"  select LocalDrivingLicenseApplicationID
+                string Query = @"  select LocalDrivingLicenseApplicationID
       ,ApplicationID
       ,LicenseClassID
 	  , PassedTests = case
@@ -205,38 +223,40 @@ Where Applications.ApplicantPersonID=@PersonID and LicenseClassID=@LicenseClassI
       ,LocalDrivingLicenseApplications.[LicenseClassID]) as t1
 ";
 
-            SqlCommand command = new SqlCommand(Query, connection);
-
-            command.Parameters.AddWithValue("LocalDrivingLicenseApplicationID", LocalAppID);
-           
-
-            try
-            {
-                connection.Open();
-                var Reader = command.ExecuteReader();
-                if (Reader.Read())
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isExist = true;
-                    AppID = (int)Reader["ApplicationID"];
-                    LicenseClassID = (int)Reader["LicenseClassID"];
-                    PassedTests = (int)Reader["PassedTests"];
+
+                    command.Parameters.AddWithValue("LocalDrivingLicenseApplicationID", LocalAppID);
+
+
+                    try
+                    {
+                        connection.Open();
+                        using (var Reader = command.ExecuteReader())
+                        {
+                            if (Reader.Read())
+                            {
+                                isExist = true;
+                                AppID = (int)Reader["ApplicationID"];
+                                LicenseClassID = (int)Reader["LicenseClassID"];
+                                PassedTests = (int)Reader["PassedTests"];
+                            }
+
+                        }
+
+                        
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show($"Error when trying to Get Local App Data");
+                    }
+                  
                 }
 
-                Reader.Close();
-
             }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show($"Error when trying to Get Local App Data");
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-
 
 
             return isExist;
@@ -246,42 +266,42 @@ Where Applications.ApplicantPersonID=@PersonID and LicenseClassID=@LicenseClassI
         {
             bool isDone = false;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"DELETE FROM [dbo].[LocalDrivingLicenseApplications]
+                string Query = @"DELETE FROM [dbo].[LocalDrivingLicenseApplications]
       WHERE [LocalDrivingLicenseApplicationID]=@LocalDrivingLicenseApplicationID
 ";
 
-            SqlCommand command = new SqlCommand(Query, connection);
-
-            command.Parameters.AddWithValue("LocalDrivingLicenseApplicationID", LocalAppID);
-
-
-            try
-            {
-                connection.Open();
-                var AffectedRows = command.ExecuteNonQuery();
-                if (AffectedRows>0)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isDone = true;
-                    
+
+                    command.Parameters.AddWithValue("LocalDrivingLicenseApplicationID", LocalAppID);
+
+
+                    try
+                    {
+                        connection.Open();
+                        var AffectedRows = command.ExecuteNonQuery();
+                        if (AffectedRows > 0)
+                        {
+                            isDone = true;
+
+                        }
+
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show($"Error when trying to Delete Local App Data");
+                    }
+
                 }
 
-
-
             }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show($"Error when trying to Delete Local App Data");
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-
 
 
             return isDone;

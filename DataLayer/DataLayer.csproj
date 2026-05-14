@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Applications.cs" />
     <Compile Include="ApplicationTypes.cs" />
+    <Compile Include="clsUtilityDataLayer.cs" />
     <Compile Include="Countries.cs" />
     <Compile Include="clsDataAccessSettings.cs" />
     <Compile Include="DetainedLicenses.cs" />

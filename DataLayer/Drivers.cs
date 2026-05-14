@@ -14,9 +14,12 @@ namespace DataLayer
 
         public static DataTable GetAllDrivers()
         {
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            DataTable dt = new DataTable();
 
-            string Query = @"SELECT [DriverID]
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
+
+                string Query = @"SELECT [DriverID]
       ,Drivers.[PersonID]
 	  ,NationalNo
       ,FullName= FirstName+' '+SecondName+' '+ThirdName+' '+LastName
@@ -27,27 +30,33 @@ namespace DataLayer
   on Drivers.PersonID=People.PersonID;";
 
 
-            SqlCommand command = new SqlCommand(Query, connection);
+                using (SqlCommand command = new SqlCommand(Query, connection))
+                {
 
-            DataTable dt = new DataTable();
-            try
-            {
-                connection.Open();
-                var Reader=command.ExecuteReader();
-                if (Reader.HasRows) { 
-                    dt.Load(Reader);
+
+
+                    try
+                    {
+                        connection.Open();
+                        using (var Reader = command.ExecuteReader())
+                        {
+
+
+                            if (Reader.HasRows)
+                            {
+                                dt.Load(Reader);
+                            }
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error When Trying To Get The Drivers Data");
+                    }
+                   
                 }
-
-                Reader.Close();
-            }
-            catch (Exception ex) {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error When Trying To Get The Drivers Data");
-            }
-            finally
-            {
-                connection.Close();
             }
 
             return dt;
@@ -55,47 +64,54 @@ namespace DataLayer
 
         public static bool isThisPersonDriver(int PersonID)
         {
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            bool isExist = false;
 
-            string Query = @"select top(1) found=1
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
+
+                string Query = @"select top(1) found=1
   from Drivers
   where PersonID=@PersonID;";
 
 
-            SqlCommand command = new SqlCommand(Query, connection);
-            command.Parameters.AddWithValue("PersonID", PersonID);
-
-            bool isExist = false;
-            try
-            {
-                connection.Open();
-                var obj = command.ExecuteScalar();
-                if (obj!=null)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                   isExist= true;
+                    command.Parameters.AddWithValue("PersonID", PersonID);
+
+                   
+                    try
+                    {
+                        connection.Open();
+                        var obj = command.ExecuteScalar();
+                        if (obj != null)
+                        {
+                            isExist = true;
+                        }
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error When Trying To Check Person exist in Drivers Data");
+                    }
+                   
                 }
 
-               
-            }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error When Trying To Check Person exist in Drivers Data");
-            }
-            finally
-            {
-                connection.Close();
             }
 
             return isExist;
         }
+
         public static int AddDriver(int PersonID,int CreatedByUserID)
         {
+            int ID = -1;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"INSERT INTO [dbo].[Drivers]
+                string Query = @"INSERT INTO [dbo].[Drivers]
            ([PersonID]
            ,[CreatedByUserID]
            ,[CreatedDate])
@@ -105,37 +121,35 @@ namespace DataLayer
            ,@CreatedDate);
 Select SCOPE_IDENTITY();";
 
-            SqlCommand command = new SqlCommand(Query, connection);
-
-            command.Parameters.AddWithValue("PersonID", PersonID);
-            command.Parameters.AddWithValue("CreatedByUserID", CreatedByUserID);
-            command.Parameters.AddWithValue("CreatedDate", DateTime.Now);
-            
-           
-            int ID = -1;
-            try
-            {
-
-                connection.Open();
-                var newID = command.ExecuteScalar();
-                if (newID != null)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    ID = Convert.ToInt32(newID);
+
+                    command.Parameters.AddWithValue("PersonID", PersonID);
+                    command.Parameters.AddWithValue("CreatedByUserID", CreatedByUserID);
+                    command.Parameters.AddWithValue("CreatedDate", DateTime.Now);
+
+
+                    
+                    try
+                    {
+
+                        connection.Open();
+                        var newID = command.ExecuteScalar();
+                        if (newID != null)
+                        {
+                            ID = Convert.ToInt32(newID);
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error When Trying to Add New Driver");
+
+                    }
+                   
                 }
-
-            }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error When Trying to Add New Driver");
-
-            }
-            finally
-            {
-
-                connection.Close();
-
             }
 
             return ID;
@@ -144,9 +158,10 @@ Select SCOPE_IDENTITY();";
         public static bool GetDriverByDriverID(int DriverID, ref int PersonID, ref int CreatedByUserID, ref DateTime CreatedDate)
         {
             bool isExist = false;
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"SELECT [DriverID]
+                string Query = @"SELECT [DriverID]
       ,[PersonID]
       ,[CreatedByUserID]
       ,[CreatedDate]
@@ -154,44 +169,46 @@ Select SCOPE_IDENTITY();";
     Where DriverID=@DriverID";
 
 
-            SqlCommand command = new SqlCommand(Query, connection);
-            command.Parameters.AddWithValue("DriverID", DriverID);
-
-           
-            try
-            {
-                connection.Open();
-                var reader = command.ExecuteReader();
-                if (reader.Read())
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isExist = true;
-                    PersonID = (int)reader["PersonID"];
-                    CreatedByUserID = (int)reader["CreatedByUserID"];
-                    CreatedDate = (DateTime)reader["CreatedDate"];
+                    command.Parameters.AddWithValue("DriverID", DriverID);
+
+
+                    try
+                    {
+                        connection.Open();
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                isExist = true;
+                                PersonID = (int)reader["PersonID"];
+                                CreatedByUserID = (int)reader["CreatedByUserID"];
+                                CreatedDate = (DateTime)reader["CreatedDate"];
+                            }
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error When Trying To Get Driver Data");
+                    }
+                    
                 }
 
-
             }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error When Trying To Get Driver Data");
-            }
-            finally
-            {
-                connection.Close();
-            }
-
             return isExist; 
         }
 
         public static bool GetDriverByPersonID(int PersonID, ref int DriverID , ref int CreatedByUserID, ref DateTime CreatedDate)
         {
             bool isExist = false;
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"SELECT [DriverID]
+                string Query = @"SELECT [DriverID]
       ,[PersonID]
       ,[CreatedByUserID]
       ,[CreatedDate]
@@ -199,33 +216,37 @@ Select SCOPE_IDENTITY();";
     Where PersonID=@PersonID";
 
 
-            SqlCommand command = new SqlCommand(Query, connection);
-            command.Parameters.AddWithValue("PersonID", PersonID);
-
-
-            try
-            {
-                connection.Open();
-                var reader = command.ExecuteReader();
-                if (reader.Read())
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isExist = true;
-                    DriverID = (int)reader["DriverID"];
-                    CreatedByUserID = (int)reader["CreatedByUserID"];
-                    CreatedDate = (DateTime)reader["CreatedDate"];
+                    command.Parameters.AddWithValue("PersonID", PersonID);
+
+
+                    try
+                    {
+                        connection.Open();
+                        using (var reader = command.ExecuteReader())
+                        {
+
+
+                            if (reader.Read())
+                            {
+                                isExist = true;
+                                DriverID = (int)reader["DriverID"];
+                                CreatedByUserID = (int)reader["CreatedByUserID"];
+                                CreatedDate = (DateTime)reader["CreatedDate"];
+                            }
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error When Trying To Get Driver Data");
+                    }
+                  
                 }
 
-
-            }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error When Trying To Get Driver Data");
-            }
-            finally
-            {
-                connection.Close();
             }
 
             return isExist;

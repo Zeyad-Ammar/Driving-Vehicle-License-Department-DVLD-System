@@ -17,75 +17,81 @@ namespace DataLayer
 
             DataTable dt = new DataTable();
 
-            SqlConnection connection=new SqlConnection(clsDataAccessSettings.connectionString);
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"SELECT [TestAppointmentID]
+                string Query = @"SELECT [TestAppointmentID]
       ,[AppointmentDate]
       ,[PaidFees] 
       ,[IsLocked]
   FROM [dbo].[TestAppointments]
 Where LocalDrivingLicenseApplicationID=@LocalDrivingLicenseApplicationID and TestTypeID=@TestTypeID";
 
-            SqlCommand command=new SqlCommand(Query, connection);
-            command.Parameters.AddWithValue("LocalDrivingLicenseApplicationID", LocalAppID);
-            command.Parameters.AddWithValue("TestTypeID", TestTypeID);
+                using (SqlCommand command = new SqlCommand(Query, connection))
+                {
+                    command.Parameters.AddWithValue("LocalDrivingLicenseApplicationID", LocalAppID);
+                    command.Parameters.AddWithValue("TestTypeID", TestTypeID);
 
-            try
-            {
-                connection.Open();
-                var Reader=command.ExecuteReader();
-                if (Reader.HasRows) { 
-                    dt.Load(Reader);
+                    try
+                    {
+                        connection.Open();
+                        using (var Reader = command.ExecuteReader())
+                        {
+                            if (Reader.HasRows)
+                            {
+                                dt.Load(Reader);
+                            }
+                        }
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error When Trying to get All Test Appointments for local App"); ;
+                    }
+                    
                 }
-                Reader.Close();
             }
-            catch (Exception ex) {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error When Trying to get All Test Appointments for local App"); ;
-            }
-            finally
-            {
-                connection.Close();
-            }
-
             return dt;
         }
 
         public static int GetNumberOfTestAppointmentsForLocalAppFromType(int LocalAppID, int TestTypeID) {
 
 
-           
+            int numberOfAppointments = 0;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"select count(TestAppointments.LocalDrivingLicenseApplicationID) from TestAppointments
+                string Query = @"select count(TestAppointments.LocalDrivingLicenseApplicationID) from TestAppointments
   where LocalDrivingLicenseApplicationID=@LocalDrivingLicenseApplicationID and TestTypeID=@TestTypeID and [IsLocked]=1;";
 
-            SqlCommand command = new SqlCommand(Query, connection);
-            command.Parameters.AddWithValue("LocalDrivingLicenseApplicationID", LocalAppID);
-            command.Parameters.AddWithValue("TestTypeID", TestTypeID);
-
-            int numberOfAppointments = 0;
-            try
-            {
-                connection.Open();
-                var numOfAppointments = command.ExecuteScalar();
-                if (numOfAppointments!=null)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    numberOfAppointments = Convert.ToInt32(numOfAppointments);
-                }
-               
-            }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
+                    command.Parameters.AddWithValue("LocalDrivingLicenseApplicationID", LocalAppID);
+                    command.Parameters.AddWithValue("TestTypeID", TestTypeID);
 
-                MessageBox.Show("Error When Trying to get number of Test Appointments for local App"); ;
-            }
-            finally
-            {
-                connection.Close();
+                    
+                    try
+                    {
+                        connection.Open();
+                        var numOfAppointments = command.ExecuteScalar();
+                        if (numOfAppointments != null)
+                        {
+                            numberOfAppointments = Convert.ToInt32(numOfAppointments);
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error When Trying to get number of Test Appointments for local App"); ;
+                    }
+                  
+                }
+
             }
 
             return numberOfAppointments;
@@ -96,9 +102,10 @@ Where LocalDrivingLicenseApplicationID=@LocalDrivingLicenseApplicationID and Tes
         {
             int newID = -1;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"INSERT INTO [dbo].[TestAppointments]
+                string Query = @"INSERT INTO [dbo].[TestAppointments]
            ([TestTypeID]
            ,[LocalDrivingLicenseApplicationID]
            ,[AppointmentDate]
@@ -116,37 +123,37 @@ Where LocalDrivingLicenseApplicationID=@LocalDrivingLicenseApplicationID and Tes
            ,@RetakeTestApplicationID);
 Select Scope_Identity()";
 
-            SqlCommand command = new SqlCommand(Query, connection);
-            command.Parameters.AddWithValue("TestTypeID", TestTypeID);
-            command.Parameters.AddWithValue("LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
-            command.Parameters.AddWithValue("AppointmentDate", AppointmentDate);
-            command.Parameters.AddWithValue("PaidFees", PaidFees);
-            command.Parameters.AddWithValue("CreatedByUserID", CreatedByUserID);
-            command.Parameters.AddWithValue("IsLocked", false);
-            if(RetakeTestAppID>0)
-                command.Parameters.AddWithValue("RetakeTestApplicationID", RetakeTestAppID);
-            else
-                command.Parameters.AddWithValue("RetakeTestApplicationID", DBNull.Value);
-
-            try
-            {
-                connection.Open();
-                var ID = command.ExecuteScalar();
-                if (ID != null)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    newID = Convert.ToInt32(ID);
+                    command.Parameters.AddWithValue("TestTypeID", TestTypeID);
+                    command.Parameters.AddWithValue("LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
+                    command.Parameters.AddWithValue("AppointmentDate", AppointmentDate);
+                    command.Parameters.AddWithValue("PaidFees", PaidFees);
+                    command.Parameters.AddWithValue("CreatedByUserID", CreatedByUserID);
+                    command.Parameters.AddWithValue("IsLocked", false);
+                    if (RetakeTestAppID > 0)
+                        command.Parameters.AddWithValue("RetakeTestApplicationID", RetakeTestAppID);
+                    else
+                        command.Parameters.AddWithValue("RetakeTestApplicationID", DBNull.Value);
+
+                    try
+                    {
+                        connection.Open();
+                        var ID = command.ExecuteScalar();
+                        if (ID != null)
+                        {
+                            newID = Convert.ToInt32(ID);
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error When Trying to Add New Test Appointments for local App"); ;
+                    }
+                   
                 }
-
-            }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error When Trying to Add New Test Appointments for local App"); ;
-            }
-            finally
-            {
-                connection.Close();
             }
 
             return newID;
@@ -156,9 +163,10 @@ Select Scope_Identity()";
         {
             bool isDone =false;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"UPDATE [dbo].[TestAppointments]
+                string Query = @"UPDATE [dbo].[TestAppointments]
    SET
        [TestTypeID] = @TestTypeID
       ,[LocalDrivingLicenseApplicationID] = @LocalDrivingLicenseApplicationID
@@ -169,41 +177,42 @@ Select Scope_Identity()";
       ,[RetakeTestApplicationID] = @RetakeTestApplicationID
  WHERE TestAppointmentID=@TestAppointmentID";
 
-            SqlCommand command = new SqlCommand(Query, connection);
-            command.Parameters.AddWithValue("TestAppointmentID", TestAppointmentID);
-            command.Parameters.AddWithValue("TestTypeID", TestTypeID);
-            command.Parameters.AddWithValue("LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
-            command.Parameters.AddWithValue("AppointmentDate", AppointmentDate);
-            command.Parameters.AddWithValue("PaidFees", PaidFees);
-            command.Parameters.AddWithValue("CreatedByUserID", CreatedByUserID);
-            command.Parameters.AddWithValue("IsLocked", isLocked);
-            if (RetakeTestAppID < 1)
-            { 
-                command.Parameters.AddWithValue("RetakeTestApplicationID", DBNull.Value); 
-            }
-            else
-            {
-                command.Parameters.AddWithValue("RetakeTestApplicationID", RetakeTestAppID);
-            }
-
-            try
-            {
-                connection.Open();
-                var AffectedRows = command.ExecuteNonQuery();
-                if (AffectedRows > 0)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isDone = true;
-                }
+                    command.Parameters.AddWithValue("TestAppointmentID", TestAppointmentID);
+                    command.Parameters.AddWithValue("TestTypeID", TestTypeID);
+                    command.Parameters.AddWithValue("LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
+                    command.Parameters.AddWithValue("AppointmentDate", AppointmentDate);
+                    command.Parameters.AddWithValue("PaidFees", PaidFees);
+                    command.Parameters.AddWithValue("CreatedByUserID", CreatedByUserID);
+                    command.Parameters.AddWithValue("IsLocked", isLocked);
+                    if (RetakeTestAppID < 1)
+                    {
+                        command.Parameters.AddWithValue("RetakeTestApplicationID", DBNull.Value);
+                    }
+                    else
+                    {
+                        command.Parameters.AddWithValue("RetakeTestApplicationID", RetakeTestAppID);
+                    }
 
-            }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-                MessageBox.Show("Error When Trying to Add New Test Appointments for local App"); ;
-            }
-            finally
-            {
-                connection.Close();
+                    try
+                    {
+                        connection.Open();
+                        var AffectedRows = command.ExecuteNonQuery();
+                        if (AffectedRows > 0)
+                        {
+                            isDone = true;
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+                        MessageBox.Show("Error When Trying to Add New Test Appointments for local App"); ;
+                    }
+                }
+                
+
             }
 
             return isDone;
@@ -211,36 +220,39 @@ Select Scope_Identity()";
 
         public static bool isOpenTestAppointmentExist(int LDLAppID,int TestTypeID)
         {
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            bool isExist = false;
 
-            string Query = @"
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
+
+                string Query = @"
 select found=1 from TestAppointments
 where LocalDrivingLicenseApplicationID=@LocalDrivingLicenseApplicationID and TestTypeID=@TestTypeID and IsLocked=0;;";
 
-            SqlCommand command = new SqlCommand(Query, connection);
-            command.Parameters.AddWithValue("LocalDrivingLicenseApplicationID", LDLAppID);
-            command.Parameters.AddWithValue("TestTypeID", TestTypeID);
-
-            bool isExist = false;
-            try
-            {
-                connection.Open();
-                var numOfAppointments = command.ExecuteScalar();
-                if (numOfAppointments != null)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isExist = true;
+                    command.Parameters.AddWithValue("LocalDrivingLicenseApplicationID", LDLAppID);
+                    command.Parameters.AddWithValue("TestTypeID", TestTypeID);
 
+                   
+                    try
+                    {
+                        connection.Open();
+                        var numOfAppointments = command.ExecuteScalar();
+                        if (numOfAppointments != null)
+                        {
+                            isExist = true;
+
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+                        MessageBox.Show("Error When Trying to check Existing of open Test Appointments for local App"); ;
+                    }
                 }
 
-            }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-                MessageBox.Show("Error When Trying to check Existing of open Test Appointments for local App"); ;
-            }
-            finally
-            {
-                connection.Close();
             }
 
             return isExist;
@@ -248,9 +260,11 @@ where LocalDrivingLicenseApplicationID=@LocalDrivingLicenseApplicationID and Tes
         public static bool GetTestAppointment(int TestAppointmentID,ref int TestTypeID,ref int LDLAppID,ref DateTime AppointmentDate,ref decimal PaidFees
             ,ref int CreatedByUserID,ref bool isLocked,ref int RetakeTestAppID)
         {
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            bool isExist = false;
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"SELECT [TestAppointmentID]
+                string Query = @"SELECT [TestAppointmentID]
       ,[TestTypeID]
       ,[LocalDrivingLicenseApplicationID]
       ,[AppointmentDate]
@@ -261,37 +275,39 @@ where LocalDrivingLicenseApplicationID=@LocalDrivingLicenseApplicationID and Tes
   FROM [dbo].[TestAppointments]
   where TestAppointmentID=@TestAppointmentID";
 
-            SqlCommand command = new SqlCommand(Query, connection);
-            command.Parameters.AddWithValue("TestAppointmentID", TestAppointmentID);
-            
-           bool isExist = false;
-            try
-            {
-                connection.Open();
-                var Reader = command.ExecuteReader();
-                if (Reader.Read())
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isExist = true;
-                    TestTypeID = (int)Reader["TestTypeID"];
-                    LDLAppID = (int)Reader["LocalDrivingLicenseApplicationID"];
-                    AppointmentDate = (DateTime)Reader["AppointmentDate"];
-                    PaidFees=(decimal)Reader["PaidFees"];
-                    CreatedByUserID=(int)Reader["CreatedByUserID"];
-                    isLocked= (bool)Reader["IsLocked"];
-                    if(Reader["RetakeTestApplicationID"]!=DBNull.Value)
-                    RetakeTestAppID= (int)Reader["RetakeTestApplicationID"];
+                    command.Parameters.AddWithValue("TestAppointmentID", TestAppointmentID);
 
+                    
+                    try
+                    {
+                        connection.Open();
+                        using (var Reader = command.ExecuteReader())
+                        {
+                            if (Reader.Read())
+                            {
+                                isExist = true;
+                                TestTypeID = (int)Reader["TestTypeID"];
+                                LDLAppID = (int)Reader["LocalDrivingLicenseApplicationID"];
+                                AppointmentDate = (DateTime)Reader["AppointmentDate"];
+                                PaidFees = (decimal)Reader["PaidFees"];
+                                CreatedByUserID = (int)Reader["CreatedByUserID"];
+                                isLocked = (bool)Reader["IsLocked"];
+                                if (Reader["RetakeTestApplicationID"] != DBNull.Value)
+                                    RetakeTestAppID = (int)Reader["RetakeTestApplicationID"];
+
+                            }
+                        }
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+                        MessageBox.Show("Error When Trying to get  Test Appointment for local App"); ;
+                    }
+                    
                 }
-                Reader.Close();
-            }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-                MessageBox.Show("Error When Trying to get  Test Appointment for local App"); ;
-            }
-            finally
-            {
-                connection.Close();
             }
 
             return isExist;

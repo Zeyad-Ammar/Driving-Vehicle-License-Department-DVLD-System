@@ -15,34 +15,41 @@ namespace DataLayer
 
         public static DataTable GetAllTestTypes()
         {
-            SqlConnection connection=new SqlConnection(clsDataAccessSettings.connectionString);
+            DataTable dt = new DataTable();
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"SELECT [TestTypeID]
+                string Query = @"SELECT [TestTypeID]
       ,[TestTypeTitle]
       ,[TestTypeDescription]
       ,[TestTypeFees]
   FROM [dbo].[TestTypes]";
 
-            SqlCommand command = new SqlCommand(Query, connection);
-            DataTable dt=new DataTable();
-            try
-            {
-                connection.Open();
-                var Reader=command.ExecuteReader();
-                if (Reader.HasRows) { 
-                    dt.Load(Reader);
+                using (SqlCommand command = new SqlCommand(Query, connection))
+                {
+                  
+                    try
+                    {
+                        connection.Open();
+                        using (var Reader = command.ExecuteReader())
+                        {
+                            if (Reader.HasRows)
+                            {
+                                dt.Load(Reader);
+                            }
+                        }
+
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error When Trying To Get Test Types");
+                    }
+
                 }
 
-                Reader.Close();
-            }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error When Trying To Get Test Types");
-            }
-            finally { 
-            connection.Close();
             }
 
             return dt;
@@ -50,9 +57,12 @@ namespace DataLayer
 
         public static bool GetTestType(int TestTypeID,ref string TestTypeTitle,ref string TestTypeDescription,ref decimal TestTypeFees) {
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            bool isExist = false;
 
-            string Query = @"SELECT [TestTypeID]
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
+
+                string Query = @"SELECT [TestTypeID]
       ,[TestTypeTitle]
       ,[TestTypeDescription]
       ,[TestTypeFees]
@@ -61,78 +71,80 @@ Where TestTypeID=@TestTypeID";
 
 
 
-            SqlCommand command = new SqlCommand(Query, connection);
-            command.Parameters.AddWithValue("TestTypeID", TestTypeID);
-
-            bool isExist = false;
-            try
-            {
-                connection.Open();
-                var Reader = command.ExecuteReader();
-                if (Reader.Read())
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isExist = true;
-                    TestTypeTitle = Reader["TestTypeTitle"].ToString();
-                    TestTypeDescription = Reader["TestTypeDescription"].ToString() ;
-                    TestTypeFees = (decimal)Reader["TestTypeFees"];
+                    command.Parameters.AddWithValue("TestTypeID", TestTypeID);
 
+                   
+                    try
+                    {
+                        connection.Open();
+                        using (var Reader = command.ExecuteReader())
+                        {
+                            if (Reader.Read())
+                            {
+                                isExist = true;
+                                TestTypeTitle = Reader["TestTypeTitle"].ToString();
+                                TestTypeDescription = Reader["TestTypeDescription"].ToString();
+                                TestTypeFees = (decimal)Reader["TestTypeFees"];
+
+                            }
+                        }
+
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+                        MessageBox.Show("Error When Trying To Get The Test Type");
+                    }
                 }
-
-                Reader.Close();
+               
             }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-                MessageBox.Show("Error When Trying To Get The Test Type");
-            }
-            finally
-            {
-                connection.Close();
-            }
-
             return isExist;
         }
 
         public static bool UpdateTestTypeDescriptionAndFees(int TestTypeID, string TestTypeDescription, decimal TestFees)
         {
 
-            SqlConnection connection=new SqlConnection(clsDataAccessSettings.connectionString);
+            bool isDone = false;
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"UPDATE [dbo].[TestTypes]
+                string Query = @"UPDATE [dbo].[TestTypes]
    SET 
       [TestTypeDescription] = @TestTypeDescription
       ,[TestTypeFees] = @TestTypeFees
  WHERE TestTypeID=@TestTypeID";
 
 
-            SqlCommand command= new SqlCommand(Query, connection);
-
-            command.Parameters.AddWithValue("TestTypeID", TestTypeID);
-            command.Parameters.AddWithValue("TestTypeDescription", TestTypeDescription);
-            command.Parameters.AddWithValue("TestTypeFees", TestFees);
-
-
-
-            bool isDone =false;
-
-            try
-            {
-                connection.Open();
-                var AffectedRows=command.ExecuteNonQuery();
-                if (AffectedRows > 0)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isDone = true;
 
+                    command.Parameters.AddWithValue("TestTypeID", TestTypeID);
+                    command.Parameters.AddWithValue("TestTypeDescription", TestTypeDescription);
+                    command.Parameters.AddWithValue("TestTypeFees", TestFees);
+
+
+
+                    try
+                    {
+                        connection.Open();
+                        var AffectedRows = command.ExecuteNonQuery();
+                        if (AffectedRows > 0)
+                        {
+                            isDone = true;
+
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+                        MessageBox.Show("Error When Trying To UpdateApplicationStatus The Test Type Data");
+                    }
+                    
                 }
-
-            }
-            catch (Exception ex) {
-                clsUtilityDataLayer.LogError(ex);
-                MessageBox.Show("Error When Trying To UpdateApplicationStatus The Test Type Data");
-            }
-            finally
-            {
-                connection.Close();
             }
 
 

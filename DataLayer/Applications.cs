@@ -12,14 +12,15 @@ namespace DataLayer
     public class Applications
     {
 
-        public static int AddApplication(int personID,DateTime ApplicationDate,int ApplicationTypeID,
-            int ApplicationStatus,DateTime LastStatusDate,decimal PaidFees,int CreatedByUserID)
+        public static int AddApplication(int personID, DateTime ApplicationDate, int ApplicationTypeID,
+            int ApplicationStatus, DateTime LastStatusDate, decimal PaidFees, int CreatedByUserID)
         {
-            
+            int ID = -1;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"INSERT INTO [dbo].[Applications]
+                string Query = @"INSERT INTO [dbo].[Applications]
            ([ApplicantPersonID]
            ,[ApplicationDate]
            ,[ApplicationTypeID]
@@ -37,94 +38,94 @@ namespace DataLayer
            ,@CreatedByUserID);
 Select SCOPE_IDENTITY();";
 
-            SqlCommand command= new SqlCommand(Query, connection);
-
-            command.Parameters.AddWithValue("ApplicantPersonID", personID);
-            command.Parameters.AddWithValue("ApplicationDate", ApplicationDate);
-            command.Parameters.AddWithValue("ApplicationTypeID", ApplicationTypeID);
-            command.Parameters.AddWithValue("ApplicationStatus", ApplicationStatus);
-            command.Parameters.AddWithValue("LastStatusDate", LastStatusDate);
-            command.Parameters.AddWithValue("PaidFees", PaidFees);
-            command.Parameters.AddWithValue("CreatedByUserID", CreatedByUserID);
-            int ID = -1;
-            try
-            {
-
-                connection.Open();
-                var newID=command.ExecuteScalar();
-                if (newID != null)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    ID=Convert.ToInt32(newID);
+
+                    command.Parameters.AddWithValue("ApplicantPersonID", personID);
+                    command.Parameters.AddWithValue("ApplicationDate", ApplicationDate);
+                    command.Parameters.AddWithValue("ApplicationTypeID", ApplicationTypeID);
+                    command.Parameters.AddWithValue("ApplicationStatus", ApplicationStatus);
+                    command.Parameters.AddWithValue("LastStatusDate", LastStatusDate);
+                    command.Parameters.AddWithValue("PaidFees", PaidFees);
+                    command.Parameters.AddWithValue("CreatedByUserID", CreatedByUserID);
+
+                    try
+                    {
+
+                        connection.Open();
+                        var newID = command.ExecuteScalar();
+                        if (newID != null)
+                        {
+                            ID = Convert.ToInt32(newID);
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error When Trying to Add New Application");
+
+                    }
+
                 }
-
-            }
-            catch (Exception ex) {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error When Trying to Add New Application");
-            
-            }
-            finally { 
-
-                connection.Close();
 
             }
 
             return ID;
         }
 
-        public static bool UpdateApplicationStatus(int ApplicationID,int ApplicationStatus)
+        public static bool UpdateApplicationStatus(int ApplicationID, int ApplicationStatus)
         {
-            bool isDone=false;
+            bool isDone = false;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"UPDATE [dbo].[Applications]
+                string Query = @"UPDATE [dbo].[Applications]
    SET 
       [ApplicationStatus] = @ApplicationStatus
       ,[LastStatusDate]=@LastStatusDate
  WHERE [ApplicationID]=@ApplicationID
 ";
 
-            SqlCommand command= new SqlCommand(Query, connection);
-
-            command.Parameters.AddWithValue("ApplicationID", ApplicationID);
-            command.Parameters.AddWithValue("ApplicationStatus", ApplicationStatus);
-            command.Parameters.AddWithValue("LastStatusDate", DateTime.Now);
-
-
-
-
-            try
-            {
-                connection.Open();
-                var AffectedRows=command.ExecuteNonQuery();
-                if (AffectedRows > 0)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isDone=true;
+
+                    command.Parameters.AddWithValue("ApplicationID", ApplicationID);
+                    command.Parameters.AddWithValue("ApplicationStatus", ApplicationStatus);
+                    command.Parameters.AddWithValue("LastStatusDate", DateTime.Now);
+
+                    try
+                    {
+                        connection.Open();
+                        var AffectedRows = command.ExecuteNonQuery();
+                        if (AffectedRows > 0)
+                        {
+                            isDone = true;
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+                        MessageBox.Show("Error When Trying to update The Application");
+                    }
+
                 }
 
             }
-            catch (Exception ex) {
-                clsUtilityDataLayer.LogError(ex);
-                MessageBox.Show("Error When Trying to update The Application");
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-
-                return isDone;
+            return isDone;
         }
 
         public static bool GetApplication(int ApplicationID,ref int AppPersonID,ref DateTime  AppDate,ref int AppTypeID,ref int AppStatus,ref DateTime LastStatusDate,ref decimal PaidFees,ref int CreatedByUserID)
         {
             bool isDone = false;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"SELECT [ApplicationID]
+                string Query = @"SELECT [ApplicationID]
       ,[ApplicantPersonID]
       ,[ApplicationDate]
       ,[ApplicationTypeID]
@@ -135,38 +136,42 @@ Select SCOPE_IDENTITY();";
   FROM [dbo].[Applications]
     Where ApplicationID=@ApplicationID";
 
-            SqlCommand command= new SqlCommand(Query, connection);
+                using (SqlCommand command = new SqlCommand(Query, connection))
+                {
+                    command.Parameters.AddWithValue("ApplicationID", ApplicationID);
 
-            command.Parameters.AddWithValue("ApplicationID", ApplicationID);
+                    try
+                    {
+                        connection.Open();
+                        using (var Reader = command.ExecuteReader())
+                        {
 
-            try
-            {
-                connection.Open();
-                var Reader=command.ExecuteReader();
-                if (Reader.Read()) {
-                    isDone= true;
-                    AppPersonID = (int)Reader["ApplicantPersonID"];
-                    AppDate = (DateTime)Reader["ApplicationDate"];
-                    AppTypeID = (int)Reader["ApplicationTypeID"];
-                    AppStatus = Convert.ToInt32(Reader["ApplicationStatus"]);
-                    LastStatusDate = (DateTime)Reader["LastStatusDate"];
-                    PaidFees = (decimal)Reader["PaidFees"];
-                    CreatedByUserID = (int)Reader["CreatedByUserID"];
+
+                            if (Reader.Read())
+                            {
+                                isDone = true;
+                                AppPersonID = (int)Reader["ApplicantPersonID"];
+                                AppDate = (DateTime)Reader["ApplicationDate"];
+                                AppTypeID = (int)Reader["ApplicationTypeID"];
+                                AppStatus = Convert.ToInt32(Reader["ApplicationStatus"]);
+                                LastStatusDate = (DateTime)Reader["LastStatusDate"];
+                                PaidFees = (decimal)Reader["PaidFees"];
+                                CreatedByUserID = (int)Reader["CreatedByUserID"];
+                            }
+
+                        }
+                       
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error When Trying to Get The Application");
+                    }
+                   
                 }
-                Reader.Close();
+
             }
-            catch (Exception ex) {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error When Trying to Get The Application");
-            }
-            finally
-            {
-
-                connection.Close();
-            }
-
-
             return isDone;
         }
 
@@ -174,44 +179,41 @@ Select SCOPE_IDENTITY();";
         {
            bool isDone = false;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"DELETE FROM [dbo].[Applications]
+                string Query = @"DELETE FROM [dbo].[Applications]
       WHERE [ApplicationID]=@ApplicationID
 ";
 
-            SqlCommand command = new SqlCommand(Query, connection);
-
-            command.Parameters.AddWithValue("ApplicationID", AppID);
-
-
-            try
-            {
-                connection.Open();
-                var AffectedRows = command.ExecuteNonQuery();
-                if (AffectedRows > 0)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isDone = true;
+                    command.Parameters.AddWithValue("ApplicationID", AppID);
+
+                    try
+                    {
+                        connection.Open();
+                        var AffectedRows = command.ExecuteNonQuery();
+                        if (AffectedRows > 0)
+                        {
+                            isDone = true;
+
+                        }
+
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show($"Error when trying to Delete App Data");
+                    }
+                   
 
                 }
 
-
-
             }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show($"Error when trying to Delete App Data");
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-
-
-
             return isDone;
         
         }

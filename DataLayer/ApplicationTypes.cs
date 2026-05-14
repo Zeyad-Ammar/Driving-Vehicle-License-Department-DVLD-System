@@ -14,76 +14,83 @@ namespace DataLayer
 
         public static DataTable GetAllApplicationTypes()
         {
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
-            string Query = @"SELECT [ApplicationTypeID]
+            DataTable dt = new DataTable();
+
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
+                string Query = @"SELECT [ApplicationTypeID]
       ,[ApplicationTypeTitle]
       ,[ApplicationFees]
   FROM [dbo].[ApplicationTypes]";
 
-            SqlCommand command = new SqlCommand(Query, connection);
-
-            DataTable dt = new DataTable();
-            try
-            {
-                connection.Open();
-
-                var Reader = command.ExecuteReader();
-                if (Reader.HasRows)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    dt.Load(Reader);
+
+
+                    try
+                    {
+                        connection.Open();
+
+                        using (var Reader = command.ExecuteReader())
+                        {
+                            if (Reader.HasRows)
+                            {
+                                dt.Load(Reader);
+                            }
+
+                        }
+                        
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error While Try Back Application Types");
+                    }
+                    
                 }
-
-                Reader.Close();
-
             }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error While Try Back Application Types");
-            }
-            finally
-            {
-                connection.Close();
-            }
-
             return dt;
         }
 
-        public static bool UpdateApplicationType(int ApplicationTypeID,decimal NewFees)
+        public static bool UpdateApplicationType(int ApplicationTypeID, decimal NewFees)
         {
+            bool isDone = false;
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            SqlConnection connection=new SqlConnection(clsDataAccessSettings.connectionString);
-
-            string Query = @"UPDATE [dbo].[ApplicationTypes]
+                string Query = @"UPDATE [dbo].[ApplicationTypes]
    SET 
       [ApplicationFees] = @ApplicationFees
  WHERE ApplicationTypeID=@ApplicationTypeID";
 
-            SqlCommand command= new SqlCommand(Query, connection);
-
-            command.Parameters.AddWithValue("ApplicationTypeID", ApplicationTypeID);
-            command.Parameters.AddWithValue("ApplicationFees", NewFees);
-            bool isDone = false;
-            try
-            {
-                connection.Open();
-                var AffectedRows = command.ExecuteNonQuery();
-                if (AffectedRows>0)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                   isDone = true;
+
+
+
+                    command.Parameters.AddWithValue("ApplicationTypeID", ApplicationTypeID);
+                    command.Parameters.AddWithValue("ApplicationFees", NewFees);
+                  
+                    try
+                    {
+                        connection.Open();
+                        var AffectedRows = command.ExecuteNonQuery();
+                        if (AffectedRows > 0)
+                        {
+                            isDone = true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error While Trying UpdateApplicationStatus The Price");
+                    }
+                  
                 }
             }
-            catch (Exception ex) {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error While Trying UpdateApplicationStatus The Price");
-            }
-            finally { 
-                connection.Close();
-            }
-
-            
 
 
 
@@ -92,41 +99,47 @@ namespace DataLayer
 
         public static bool GetApplicationType(int ApplicationTypeID,ref string ApplicationTypeName,ref decimal ApplicationtypeFees) {
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            bool isDone = false;
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"SELECT [ApplicationTypeID]
+
+
+                string Query = @"SELECT [ApplicationTypeID]
       ,[ApplicationTypeTitle]
       ,[ApplicationFees]
   FROM [dbo].[ApplicationTypes]
 Where ApplicationTypeID=@ApplicationTypeID";
 
-            SqlCommand command=new SqlCommand(Query, connection);
-
-            command.Parameters.AddWithValue("ApplicationTypeID", ApplicationTypeID);
-
-            bool isDone=false;
-            try
-            {
-                connection.Open();
-                var Reader=command.ExecuteReader();
-                if (Reader.Read())
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isDone=true;
-                    ApplicationTypeName = Reader["ApplicationTypeTitle"].ToString();
-                    ApplicationtypeFees = (decimal)Reader["ApplicationFees"];
 
+                    command.Parameters.AddWithValue("ApplicationTypeID", ApplicationTypeID);
+
+                    
+                    try
+                    {
+                        connection.Open();
+                        using (var Reader = command.ExecuteReader())
+                        {
+                            if (Reader.Read())
+                            {
+                                isDone = true;
+                                ApplicationTypeName = Reader["ApplicationTypeTitle"].ToString();
+                                ApplicationtypeFees = (decimal)Reader["ApplicationFees"];
+
+                            }
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                    }
+                   
                 }
-
             }
-            catch (Exception ex) { 
-                clsUtilityDataLayer.LogError(ex);
-
-            }
-            finally
-            {
-                connection.Close(); 
-            }
-
             return isDone;
         }
 

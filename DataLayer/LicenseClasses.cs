@@ -13,9 +13,11 @@ namespace DataLayer
     {
         public static DataTable GetAllLicenseClasses()
         {
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            DataTable dt = new DataTable();
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"SELECT [LicenseClassID]
+                string Query = @"SELECT [LicenseClassID]
       ,[ClassName]
       ,[ClassDescription]
       ,[MinimumAllowedAge]
@@ -23,29 +25,31 @@ namespace DataLayer
       ,[ClassFees]
   FROM [dbo].[LicenseClasses]";
 
-            SqlCommand command = new SqlCommand(Query, connection);
-
-            DataTable dt = new DataTable();
-            try
-            {
-                connection.Open();
-                var Reader = command.ExecuteReader();
-                if (Reader.HasRows)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    dt.Load(Reader);
+
+                    
+                    try
+                    {
+                        connection.Open();
+                        using (var Reader = command.ExecuteReader())
+                        {
+                            if (Reader.HasRows)
+                            {
+                                dt.Load(Reader);
+                            }
+                        }
+                       
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error When Trying To Get License Classes Data");
+                    }
                 }
-                Reader.Close();
-
-            }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error When Trying To Get License Classes Data");
-            }
-            finally
-            {
-                connection.Close();
+               
             }
 
             return dt;
@@ -55,9 +59,10 @@ namespace DataLayer
         {
             bool isDone=false;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"SELECT [LicenseClassID]
+                string Query = @"SELECT [LicenseClassID]
       ,[ClassName]
       ,[ClassDescription]
       ,[MinimumAllowedAge]
@@ -66,36 +71,41 @@ namespace DataLayer
   FROM [dbo].[LicenseClasses]
     Where LicenseClassID=@LicenseClassID";
 
-            SqlCommand command= new SqlCommand(Query, connection);
-
-            command.Parameters.AddWithValue("LicenseClassID", LicenseClassID);
-
-            try
-            {
-                connection.Open ();
-                var Reader = command.ExecuteReader();
-                if (Reader.Read())
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isDone = true;
-                    ClassName = Reader["ClassName"].ToString();
-                    ClassDescription = Reader["ClassDescription"].ToString();
-                    MinimumAllowedAge = Convert.ToInt32(Reader["MinimumAllowedAge"]);
-                    DefaultValidityLength = Convert.ToInt32(Reader["DefaultValidityLength"]);
-                    ClassFees = (decimal)Reader["ClassFees"];
 
+                    command.Parameters.AddWithValue("LicenseClassID", LicenseClassID);
+
+                    try
+                    {
+                        connection.Open();
+                        using (var Reader = command.ExecuteReader())
+                        {
+
+
+                            if (Reader.Read())
+                            {
+                                isDone = true;
+                                ClassName = Reader["ClassName"].ToString();
+                                ClassDescription = Reader["ClassDescription"].ToString();
+                                MinimumAllowedAge = Convert.ToInt32(Reader["MinimumAllowedAge"]);
+                                DefaultValidityLength = Convert.ToInt32(Reader["DefaultValidityLength"]);
+                                ClassFees = (decimal)Reader["ClassFees"];
+
+                            }
+                        }
+                       
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error When Trying To Get License Class Data");
+                    }
+                    
                 }
-                Reader.Close();
 
-            } 
-            catch (Exception ex) 
-            {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error When Trying To Get License Class Data");
-            }
-            finally
-            {
-                connection.Close();
             }
 
             return isDone;

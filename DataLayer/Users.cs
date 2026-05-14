@@ -14,10 +14,11 @@ namespace DataLayer
         public static DataTable GetAllUsers()
         {
             DataTable dt = new DataTable();
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
 
-            string Query = @"SELECT [UserID]
+                string Query = @"SELECT [UserID]
       ,Users.PersonID
 	  ,(FirstName+' '+SecondName+' '+ThirdName+' '+LastName) as FullName
       ,[UserName]
@@ -29,36 +30,40 @@ namespace DataLayer
   on People.PersonID=Users.PersonID;";
 
 
-            SqlCommand command=new SqlCommand(Query, connection);
-
-            try
-            {
-                connection.Open();
-                var reader = command.ExecuteReader();
-                if (reader.HasRows)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    dt.Load(reader);
-                }
-                reader.Close();
-            }
-            catch (Exception ex) {
-                
-                clsUtilityDataLayer.LogError(ex);
-                MessageBox.Show("Error While Try Get Users Data");
-            }
-            finally
-            {
-                connection.Close();
-            }
 
+                    try
+                    {
+                        connection.Open();
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.HasRows)
+                            {
+                                dt.Load(reader);
+                            }
+                        }
+                        
+                    }
+                    catch (Exception ex)
+                    {
+
+                        clsUtilityDataLayer.LogError(ex);
+                        MessageBox.Show("Error While Try Get Users Data");
+                    }
+                   
+                }
+            }
 
             return dt;
         }
 
         public static int AddUser(int PersonID,string UserName,string Password,bool isActive)
         {
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
-            string Query = @"INSERT INTO [dbo].[Users]
+            int UserID = -1;
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
+                string Query = @"INSERT INTO [dbo].[Users]
            ([PersonID]
            ,[UserName]
            ,[Password]
@@ -71,29 +76,32 @@ namespace DataLayer
 Select Scope_Identity()
     ";
 
-            SqlCommand command = new SqlCommand(Query, connection);
+                using (SqlCommand command = new SqlCommand(Query, connection))
+                {
 
-            command.Parameters.AddWithValue("PersonID", PersonID);
-            command.Parameters.AddWithValue("UserName", UserName);
-            command.Parameters.AddWithValue("Password", Password);
-            command.Parameters.AddWithValue("IsActive", isActive);
+                    command.Parameters.AddWithValue("PersonID", PersonID);
+                    command.Parameters.AddWithValue("UserName", UserName);
+                    command.Parameters.AddWithValue("Password", Password);
+                    command.Parameters.AddWithValue("IsActive", isActive);
 
-            int UserID = -1;
-            try
-            {
-                connection.Open();
-                object ID=command.ExecuteScalar();
-                if (ID != null) {
-                    UserID = Convert.ToInt32(ID);
+                   
+                    try
+                    {
+                        connection.Open();
+                        object ID = command.ExecuteScalar();
+                        if (ID != null)
+                        {
+                            UserID = Convert.ToInt32(ID);
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+                        MessageBox.Show("Error When Try Add New User");
+                    }
+                    
                 }
-
-            }
-            catch (Exception ex) {
-                clsUtilityDataLayer.LogError(ex);
-                MessageBox.Show("Error When Try Add New User");
-            }
-            finally { 
-                connection.Close();
             }
 
             return UserID;
@@ -102,8 +110,11 @@ Select Scope_Identity()
 
         public static bool UpdateUser( int UserID,string UserName, string Password, bool isActive)
         {
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
-            string Query = @"UPDATE [dbo].[Users]
+            bool isDone = false;
+
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
+                string Query = @"UPDATE [dbo].[Users]
    SET 
        [UserName] = @UserName
       ,[Password] = @Password
@@ -112,82 +123,90 @@ Select Scope_Identity()
         UserID=@UserID;
     ";
 
-            SqlCommand command = new SqlCommand(Query, connection);
-
-            command.Parameters.AddWithValue("UserID", UserID);
-            command.Parameters.AddWithValue("UserName", UserName);
-            command.Parameters.AddWithValue("Password", Password);
-            command.Parameters.AddWithValue("IsActive", isActive);
-
-            bool isDone = false;
-            
-            try
-            {
-                connection.Open();
-                var AffectedRows = command.ExecuteNonQuery();
-                if (AffectedRows>0)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isDone = true;
+
+                    command.Parameters.AddWithValue("UserID", UserID);
+                    command.Parameters.AddWithValue("UserName", UserName);
+                    command.Parameters.AddWithValue("Password", Password);
+                    command.Parameters.AddWithValue("IsActive", isActive);
+
                    
+
+                    try
+                    {
+                        connection.Open();
+                        var AffectedRows = command.ExecuteNonQuery();
+                        if (AffectedRows > 0)
+                        {
+                            isDone = true;
+
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error When Try Add New User");
+                    }
                 }
-
-            }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-
-                MessageBox.Show("Error When Try Add New User");
-            }
-            finally
-            {
-                connection.Close();
+                
             }
 
             return isDone;
 
         }
 
-        public static bool DeleteUser(int UserID) { 
-            
-            SqlConnection connection=new SqlConnection(clsDataAccessSettings.connectionString);
+        public static bool DeleteUser(int UserID) 
+        {
+            bool isDone = false;
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"DELETE FROM [dbo].[Users]
+                string Query = @"DELETE FROM [dbo].[Users]
       WHERE UserID=@UserID";
 
-            SqlCommand command= new SqlCommand(Query, connection);
-
-            command.Parameters.AddWithValue("UserID", UserID);
-
-            bool isDone = false;
-            try
-            {
-                connection.Open();
-                var AffectedRows = command.ExecuteNonQuery();
-                if (AffectedRows > 0)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isDone = true;
+
+                    command.Parameters.AddWithValue("UserID", UserID);
+
+                   
+                    try
+                    {
+                        connection.Open();
+                        var AffectedRows = command.ExecuteNonQuery();
+                        if (AffectedRows > 0)
+                        {
+                            isDone = true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+
+                        MessageBox.Show("Error While Tring Delete User");
+
+                    }
+
                 }
-            }catch(Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
+                
 
-                MessageBox.Show("Error While Tring Delete User");
-               
             }
-            finally
-            {
-                connection.Close();
-            }
-
 
             return isDone;
 
         }
 
         public static bool GetUser(int UserID,ref int PersonID,ref string UserName,ref string Password, ref bool IsActive) {
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
 
-            string Query = @"SELECT [UserID]
+            bool isDone = false;
+
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
+
+                string Query = @"SELECT [UserID]
       ,[PersonID]
       ,[UserName]
       ,[Password]
@@ -195,34 +214,37 @@ Select Scope_Identity()
   FROM [dbo].[Users]
 Where UserID=@UserID";
 
-            SqlCommand command= new SqlCommand(Query, connection);
-
-            command.Parameters.AddWithValue("UserID", UserID);
-
-            bool isDone = false;
-            try
-            {
-                connection.Open();
-
-                var Reader = command.ExecuteReader();
-                if (Reader.Read())
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isDone = true;
-                    PersonID = (int)Reader["PersonID"];
-                    UserName = Reader["UserName"].ToString();
-                    Password = Reader["Password"].ToString();
-                    IsActive = (bool)Reader["IsActive"];
+
+                    command.Parameters.AddWithValue("UserID", UserID);
+
+                    
+                    try
+                    {
+                        connection.Open();
+
+                        var Reader = command.ExecuteReader();
+                        if (Reader.Read())
+                        {
+                            isDone = true;
+                            PersonID = (int)Reader["PersonID"];
+                            UserName = Reader["UserName"].ToString();
+                            Password = Reader["Password"].ToString();
+                            IsActive = (bool)Reader["IsActive"];
 
 
+                        }
+                        Reader.Close();
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+                        MessageBox.Show("Error While Tring Get User");
+                    }
+                  
                 }
-                Reader.Close();
-
-            }
-            catch (Exception ex) {
-                clsUtilityDataLayer.LogError(ex);
-                MessageBox.Show("Error While Tring Get User");
-            }finally {
-                connection.Close();
             }
 
             return isDone;
@@ -230,9 +252,12 @@ Where UserID=@UserID";
 
         public static bool GetUser(string UserName,ref int UserID, ref int PersonID,  string Password, ref bool IsActive)
         {
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            bool isDone = false;
 
-            string Query = @"SELECT [UserID]
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
+
+                string Query = @"SELECT [UserID]
       ,[PersonID]
       ,[UserName]
       ,[Password]
@@ -240,38 +265,40 @@ Where UserID=@UserID";
   FROM [dbo].[Users]
 Where UserName=@UserName and Password=@Password";
 
-            SqlCommand command = new SqlCommand(Query, connection);
-
-            command.Parameters.AddWithValue("UserName", UserName);
-            command.Parameters.AddWithValue("Password", Password);
-
-
-            bool isDone = false;
-            try
-            {
-                connection.Open();
-
-                var Reader = command.ExecuteReader();
-                if (Reader.Read())
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isDone = true;
-                    PersonID = (int)Reader["PersonID"];
-                    UserID = (int)Reader["UserID"];
-                    IsActive = (bool)Reader["IsActive"];
+
+                    command.Parameters.AddWithValue("UserName", UserName);
+                    command.Parameters.AddWithValue("Password", Password);
 
 
+                   
+                    try
+                    {
+                        connection.Open();
+
+                        using (var Reader = command.ExecuteReader())
+                        {
+                            if (Reader.Read())
+                            {
+                                isDone = true;
+                                PersonID = (int)Reader["PersonID"];
+                                UserID = (int)Reader["UserID"];
+                                IsActive = (bool)Reader["IsActive"];
+
+
+                            }
+                        }
+                       
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+                        MessageBox.Show("Error While Tring Get User");
+                    }
+                    
                 }
-                Reader.Close();
-
-            }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-                MessageBox.Show("Error While Tring Get User");
-            }
-            finally
-            {
-                connection.Close();
             }
 
             return isDone;
@@ -279,41 +306,43 @@ Where UserName=@UserName and Password=@Password";
 
         public static bool isAccountExist(string UserName,string Password)
         {
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            bool isExist = false;
 
-            string Query = @"SELECT Found=1
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
+
+                string Query = @"SELECT Found=1
   FROM [dbo].[Users]
 Where [UserName]=@UserName and [Password]=@Password and [IsActive]=1";
 
-            SqlCommand command = new SqlCommand(Query, connection);
-
-            command.Parameters.AddWithValue("UserName", UserName);
-            command.Parameters.AddWithValue("Password", Password);
-
-
-
-
-            bool isExist = false;
-            try
-            {
-                connection.Open();
-
-                var obj = command.ExecuteScalar();
-                if (obj != null)
+                using (SqlCommand command = new SqlCommand(Query, connection))
                 {
-                    isExist = true;
+
+                    command.Parameters.AddWithValue("UserName", UserName);
+                    command.Parameters.AddWithValue("Password", Password);
+
+                   
+                    try
+                    {
+                        connection.Open();
+
+                        var obj = command.ExecuteScalar();
+                        if (obj != null)
+                        {
+                            isExist = true;
+                        }
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+                        MessageBox.Show("Error While Tring Check Account Existing");
+                    }
+                   
+
                 }
 
-
-            }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-                MessageBox.Show("Error While Tring Check Account Existing");
-            }
-            finally
-            {
-                connection.Close();
             }
 
             return isExist;
@@ -322,37 +351,39 @@ Where [UserName]=@UserName and [Password]=@Password and [IsActive]=1";
         }
         public static bool isPersonUser(int PersonID)
         {
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString);
+            bool isDone = false;
+            using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.connectionString))
+            {
 
-            string Query = @"SELECT Found=1
+                string Query = @"SELECT Found=1
   FROM [dbo].[Users]
 Where PersonID=@PersonID";
 
-            SqlCommand command = new SqlCommand(Query, connection);
+                using (SqlCommand command = new SqlCommand(Query, connection))
+                {
+                    command.Parameters.AddWithValue("PersonID", PersonID);
 
-            command.Parameters.AddWithValue("PersonID", PersonID);
+                    
+                    try
+                    {
+                        connection.Open();
+
+                        var obj = command.ExecuteScalar();
+                        if (obj != null)
+                        {
+                            isDone = true;
+                        }
 
 
-            bool isDone = false;
-            try
-            {
-                connection.Open();
-
-                var obj = command.ExecuteScalar();
-                if (obj != null) { 
-                    isDone= true;
+                    }
+                    catch (Exception ex)
+                    {
+                        clsUtilityDataLayer.LogError(ex);
+                        MessageBox.Show("Error While Tring Get User");
+                    }
+                    
                 }
-                
 
-            }
-            catch (Exception ex)
-            {
-                clsUtilityDataLayer.LogError(ex);
-                MessageBox.Show("Error While Tring Get User");
-            }
-            finally
-            {
-                connection.Close();
             }
 
             return isDone;
