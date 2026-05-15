@@ -36,10 +36,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BusinessLayer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>BusinessLayer\obj\Debug\BusinessLayer.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -705,6 +701,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Delete User 32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="BusinessLayer\BusinessLayer.csproj">
+      <Project>{9ffbfeed-6220-461e-b50d-e4768633f378}</Project>
+      <Name>BusinessLayer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
