@@ -22,7 +22,7 @@ namespace DVLD_Project
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            if (!clsCurrentUser.checkAuthentication(tbUserName.Text.Trim(), tbPassword.Text.Trim())) {
+            if (!clsCurrentUser.checkAuthentication(tbUserName.Text.Trim(), clsUtil.GetHash(tbPassword.Text.Trim()))) {
                 MessageBox.Show("The Username Or Password is  Wrong","Error",MessageBoxButtons.OK,MessageBoxIcon.Error);
                 return;
             }
@@ -34,7 +34,7 @@ namespace DVLD_Project
             }
 
             if (chkRememberMe.Checked) {
-                clsCurrentUser.StoreCurrentUserCredentials();
+                clsCurrentUser.StoreCurrentUserCredentials(tbUserName.Text.Trim(),tbPassword.Text.Trim());
             }
            
 

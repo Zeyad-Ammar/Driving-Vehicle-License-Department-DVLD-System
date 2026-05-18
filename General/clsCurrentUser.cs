@@ -31,7 +31,7 @@ namespace DVLD_Project.General
         }
 
 
-        public static bool StoreCurrentUserCredentials()
+        public static bool StoreCurrentUserCredentials(string UserName,string Password)
         {
 
 
@@ -41,7 +41,7 @@ namespace DVLD_Project.General
               
                 
                
-                string dataToSave = User.UserName + "#//#" + User.Password;
+                string dataToSave = UserName + "#//#" + Password;
 
                 Registry.SetValue(_path,_DataName, dataToSave,RegistryValueKind.String);
 

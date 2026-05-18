@@ -37,9 +37,8 @@ namespace DVLD_Project.Users
         {
             
             tbUserName.Text = _User.UserName;
-            tbPassword.Text = _User.Password;
-            tbConfirmPassword.Text = _User.Password;
             chkIsActive.Checked = _User.isActive;
+            tbPassword.Text = tbConfirmPassword.Text = _User.Password;
             ctrlPersonCardWithFilter1.SetPersonData(_User.PersonID);
 
             
@@ -92,7 +91,7 @@ namespace DVLD_Project.Users
         {
             _User.PersonID=ctrlPersonCardWithFilter1.getSelectedPersonID();
             _User.UserName=tbUserName.Text.Trim(); 
-            _User.Password=tbPassword.Text.Trim();
+            _User.Password=clsUtil.GetHash(tbPassword.Text.Trim());
             _User.isActive=chkIsActive.Checked;
 
         }

@@ -27,7 +27,8 @@ namespace DVLD_Project.Users
 
         private bool _CheckCurrentPassword(string password)
         {
-            return _User.Password == password;
+
+            return _User.Password == (password);
         }
         private bool _CheckValidation()
         {
@@ -92,14 +93,19 @@ namespace DVLD_Project.Users
             }
             else
             {
-                _User.Password = tbNewPassword.Text;
+                _User.Password = clsUtil.GetHash(tbNewPassword.Text) ;
             }
 
-                
 
-            _User.Save();
 
-            MessageBox.Show("The Data Updated Successfully");
+            if (_User.Save())
+            {
+                MessageBox.Show("The Data Updated Successfully");
+            }
+            else
+            {
+                MessageBox.Show("Error While Updating Data");
+            }
 
             tbConfirmPassword.Text = tbNewPassword.Text = tbCurrentPassword.Text = "";
 

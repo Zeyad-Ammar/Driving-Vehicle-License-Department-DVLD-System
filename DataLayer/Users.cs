@@ -148,7 +148,7 @@ Select Scope_Identity()
                     {
                         clsUtilityDataLayer.LogError(ex);
 
-                        MessageBox.Show("Error When Try Add New User");
+                        MessageBox.Show("Error When Try Update New User");
                     }
                 }
                 

@@ -14,14 +14,6 @@ namespace DataLayer
     public class People
     {
         
-
-   
-
-
-    
-
-       
-
         public static bool FindPersonWithNationalNo(string NationalNo)
         {
 
