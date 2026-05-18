@@ -28,7 +28,7 @@ namespace DVLD_Project.Users
         private bool _CheckCurrentPassword(string password)
         {
 
-            return _User.Password == (password);
+            return _User.Password == clsUtil.GetHash(password);
         }
         private bool _CheckValidation()
         {
